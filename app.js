@@ -5,6 +5,7 @@ const http         = require('http'),
       contentTypes = require('./utils/content-types'),
       sysInfo      = require('./utils/sys-info'),
       info         = require('./info'),
+      typing       = require('./typing'),
       env          = process.env
 
 let app = express()
@@ -20,6 +21,8 @@ app.use('/info', info)
 app.get('/hello', (req, res)=>{
     res.end('hello world')
 })
+
+app.use('/typing', typing)
 
 let server = http.createServer(app)
 
