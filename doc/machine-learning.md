@@ -77,3 +77,70 @@ tips
  theta' \* x : matrix<1, 1>
  X \* theta : matrix<m, 1>
 
+
+
+week3
+---
+
+calssification
+
+ g(z) = sigmoid(z) = 1/(1+e^-z)
+ h(theta, x) = g(theta' \* x)
+ 
+ d(y) = decide(y) = if y < 0.5 then 0 else 1
+ 
+ 
+cost function
+
+ c(y1, y) = if y == 1 then -log(y1) else -log(1-y1)
+ m = count of examples
+ J(theta) = (1/m)\*sum(i from 1 to m)(c(h(theta, x[i]), y[i]))
+
+
+simplified cost function and gradient descent
+
+ c1(y1, y) = c(y1, y) = -y \* log(y1) - (1-y) \* log(1-y1) 
+ h = g(X \* theta)
+ m = count of examples
+ J(theta) = (1/m) \* (-y' \* log(h) -(1-y)' \* log(1-h))
+ J'(theta) = -(1/m) \* X' \* (g(X \* theta)-y)
+ 
+ 
+one vs all
+ if y in {0,1, ... ,n}
+ genrate y0,y1, ... ,yn for training theta0, ... ,thetan
+ which yi = y if index == i then 1 else 0 
+
+and find the max h(theta[i], x) is the predect i of x
+
+
+regularization
+
+overfitting
+
+ cost of training set is low
+ cost of test set is heigh
+ 
+ 
+cost function
+
+ lambda = regularization parameter
+ m = count of examples
+ J(theta) = (1/(2\*m)) \* sum(i from 1 to m)((h(theta,x[i])-y[i])^2) + lambda \* sum(j from 2 to n)(theta[j]^2)
+ 
+ J'(theta) = (1/m) \* sum(i for 1 to m)(h(theta,x[i])-y[i])x[i] + (lambda/m) \* theta_with_1_colum_set_to_zero
+ 
+ 
+normal equation
+
+ L = diag(0,1,1, ... ,1)
+ theta = (X'X + lambda \* L)^-1 \* X' \* y
+ 
+
+regularized logistic regression
+
+ m = count of examples
+ cost(y1, y) = -y \* log(y1) -(1-y) \* log(1-y1)
+ J(theta) = (1/m) \* sum(i from 1 to m)(cost(h(theta, x))) + lambda/(2\*m) \* sum(j from 2 to n)(theta[j]^2)
+ 
+ 
