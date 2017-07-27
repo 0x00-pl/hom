@@ -144,3 +144,45 @@ regularized logistic regression
  J(theta) = (1/m) \* sum(i from 1 to m)(cost(h(theta, x))) + lambda/(2\*m) \* sum(j from 2 to n)(theta[j]^2)
  
  
+ week4
+ ---
+ 
+ model representation
+
+```
+  [         [
+  x0,       a0,
+  x1,  -->  a1,  -->  h(theta, x)
+  x2,       a2,
+  x3        a3
+  ]         ]
+```
+
+ z[j] = theta[j-1] \* a[j-1]
+ a[j] = g(z[j])
+ h(theta, x) = a[j+1] = g(z[j+1])
+ 
+ 
+examples and intuitions
+
+```
+ theta[1] = [-30,  20,  20;
+              10, -20, -20]
+ theta[2] = [-10, 20, 20]
+```
+
+ a[2] = g(theta[1] \* x)
+ a[3] = g(theta[2] \* a[2])
+ h(theta, x) = a[3]
+
+
+multiclass classification
+
+ example:
+               [
+               0,
+ h(theta, x) = 0,
+               1,
+               0,
+               ]
+
