@@ -186,3 +186,48 @@ multiclass classification
                0,
                ]
 
+week5
+---
+
+
+cost function
+
+ m = count of examples
+ K = count of y[i]
+ J(theta) = -1/m \* sum(i from 1 to m, k from 1 to K)(
+  y[i][k] \* log(h(theta,x[i])[k]) +
+  (1-y[i][k]) \* log(1-h(theta,x[i])[k])
+ ) + lambda/(2\*m) \* sum(all theta square)
+
+
+backpropagation algotithm
+
+ L = sum of layers
+ s[L] = a[L] - y
+ s[l] = (theta[l]' \* s[l+1]) .\* a[l] .\* (1-a[l])
+ 
+ S[l] = S[l] + s[l+1] \* a[l]'
+
+gradient checking
+
+ (d/d theta) J(theta) =~= (J(theta + e) - J(theta - e)) / (2\*e)
+ 
+ 
+random initialization
+
+ forall i, theta[i] = rand(-e, e)
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
