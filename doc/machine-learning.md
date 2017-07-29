@@ -218,7 +218,13 @@ random initialization
  forall i, theta[i] = rand(-e, e)
  
  
+week6
+---
 
+
+ training set: 60%
+ cross validation set: 20%
+ test set: 20%
 
 
 
