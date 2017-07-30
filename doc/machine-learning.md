@@ -221,13 +221,24 @@ random initialization
 week6
 ---
 
-
  training set: 60%
  cross validation set: 20%
  test set: 20%
 
 
+week7
+---
 
+support vector machines
+
+ linear svm is just like linear regression
+ 
+ kernal svm sets featute to the length of kernals
+ 
+
+dimensionality resuction
+
+ PCA alorithm
 
 
 
