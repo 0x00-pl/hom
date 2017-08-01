@@ -241,10 +241,30 @@ dimensionality resuction
  PCA alorithm
 
 
+week8
+---
+
+anomaly detection
+
+ normalize features
+ seprate positive and negative
 
 
+recommender systems
 
+     [
+ X = x'
+     ]
+     
+     
+           [
+ Theta = theta'
+           ]
 
-
-
+ J = (1/2) \* sum(r)((theta[j]' \* x[i] - y[i][j])^2)
+ 
+ d x[i][k] = sum(r)((theta[j]' \* x[i] - y[i][j]) \* theta[j][k]) + lambda \* x[i][k]
+ d theta[j][k] = sum(r)((theta[j]' \* x[i] - y[i][j]) \* x[i][k]) + lambda \* theta[j][k]
+ 
+ 
 
