@@ -267,4 +267,26 @@ recommender systems
  d theta[j][k] = sum(r)((theta[j]' \* x[i] - y[i][j]) \* x[i][k]) + lambda \* theta[j][k]
  
  
+week9
+---
 
+learning with largw datasets
+
+ more data is more profmance than different algorithm.
+ 
+ plot learning curves
+ cv means cross validation
+ if J_train is low and J_cv is heigh then you may need more datasets.
+ if J_train and J_cv is near that more datasets is not seemly useful, you need new network model or more features.
+ 
+stochastic gradient descent
+
+ batch gradient descent
+ do not use all data to calculate d_J but split data set to more small set and use them to calculate d_j one by one.
+ 
+map reduce
+
+ change sum to many sub sum run on mulit cores.
+ 
+ 
+ 
