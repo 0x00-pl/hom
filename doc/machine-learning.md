@@ -241,7 +241,7 @@ dimensionality resuction
  PCA alorithm
 
 
-week8
+week9
 ---
 
 anomaly detection
@@ -267,10 +267,10 @@ recommender systems
  d theta[j][k] = sum(r)((theta[j]' \* x[i] - y[i][j]) \* x[i][k]) + lambda \* theta[j][k]
  
  
-week9
+week10
 ---
 
-learning with largw datasets
+learning with large datasets -large scale machine learning
 
  more data is more profmance than different algorithm.
  
@@ -278,7 +278,10 @@ learning with largw datasets
  cv means cross validation
  if J_train is low and J_cv is heigh then you may need more datasets.
  if J_train and J_cv is near that more datasets is not seemly useful, you need new network model or more features.
- 
+
+ plot learning curves for J_train and J_cv see if its have big gape and decided if needed to get more data.
+  
+
 stochastic gradient descent
 
  batch gradient descent
@@ -289,4 +292,25 @@ map reduce
  change sum to many sub sum run on mulit cores.
  
  
+week11
+---
+ 
+OCR pipeline
+ 
+ text detection
+ character segmentation
+ character classification
+ 
+sliding windows
+
+ cut a image to many small images by sliding a window. detect target in each window.
+ 
+ generate more data from dataset.  noise is useless. scale and routate may work.
+ 
+ 
+ ceiling analysis: what part of the popeline to work on next
+ 
+  change each path to const write y and see total result changes
+  
+  
  
