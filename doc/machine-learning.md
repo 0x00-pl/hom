@@ -241,6 +241,29 @@ dimensionality resuction
  PCA alorithm
 
 
+week8
+---
+
+k-means algorithm
+ 
+ cluster centroids: color each point to a set
+ move cluster controids: move to avgage of points
+ 
+ iterator until stable
+ 
+ k is predecided
+ 
+ sets are random initializationed
+ 
+ 
+dimensionality reduction
+
+ data compression
+ visuallzation
+ 
+ PCA: principal component analysis
+
+
 week9
 ---
 
