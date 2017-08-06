@@ -6,6 +6,7 @@ const http         = require('http'),
       sysInfo      = require('./utils/sys-info'),
       info         = require('./info'),
       typing       = require('./typing'),
+      doc          = require('./doc'),
       env          = process.env
 
 let app = express()
