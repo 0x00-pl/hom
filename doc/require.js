@@ -24,7 +24,7 @@ function resolve_single(name, lib_path, timeout){
     let time_handler = null
 
     let timer = new Promise((resolve,reject)=>{
-        time_handler = setTimeout(timeout, ()=>{cancle_script(name); resolve(true)})
+        time_handler = setTimeout(timeout, ()=>{cancle_script(name); reject('timeout') })
     })
     let loader = new Promise((resolve,reject)=>{
         load_script(name, url, (...args)=>{console.log(...args); cleanTimeout(time_handler); resolve(args)})
@@ -32,3 +32,5 @@ function resolve_single(name, lib_path, timeout){
 
     return Promise.race([timer, loader])
 }
+
+
