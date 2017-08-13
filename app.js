@@ -17,13 +17,12 @@ app.get('/health', (req, res)=>{
     res.status(200).end()
 })
 
-app.use('/info', info)
+[
+    ['/info', info],
+    ['/tping', typing],
+    ['/doc', doc]
+].forEach(([mounted, router])=>app.use(mounted, app))
 
-app.get('/hello', (req, res)=>{
-    res.end('hello world')
-})
-
-app.use('/typing', typing)
 
 let server = http.createServer(app)
 
