@@ -25,7 +25,7 @@ define(['tools', 'document'], (tools, document)=>{
         }
     }
 
-    render_chapter_list(chapter_list, target){
+    function render_chapter_list(chapter_list, target){
         let list = dom('div', {}, chapter_list.map(([name, url])=>{
             return ['a', {href: url}, name]
         }))
@@ -33,14 +33,14 @@ define(['tools', 'document'], (tools, document)=>{
         target.appendChild(list)
     }
 
-    fetch_chapter_list(prefix){
+    function fetch_chapter_list(prefix){
         prefix = prefix || ''
         return fetch(prefix+'chapter_list.api').then(b=>b.json())
     }
 
     return ()=>{
         fetch_chapter_list().then(j=>{
-            let target = document.getElementByClassName('chapter_list')[0]
+            let target = document.getElementsByClassName('chapter_list')[0]
             render_chapter_list(j, target)
         })
     }
