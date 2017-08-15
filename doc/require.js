@@ -34,7 +34,9 @@ define = function (){
     }
 
     function define(req, cb){
-        req.map(name )
+        cb = cb || (x=>x)
+        let loader_list = req.map(name=>resolve_single(name, '', 5000))
+        return Promise.all(loader_list).then(cb)
     }
     return define
 }()

@@ -4,12 +4,12 @@ const express = require('express'),
 
 let router = express.Router()
 
-router.use((req,res,next)=>{
-   console.log(req.originalUrl); // '/admin/new'
-   console.log(req.baseUrl); // '/admin'
-   console.log(req.path); // '/new'
-   next()
-})
+// router.use((req,res,next)=>{
+//    console.log(req.originalUrl); // '/admin/new'
+//    console.log(req.baseUrl); // '/admin'
+//    console.log(req.path); // '/new'
+//    next()
+// })
 
 router.get('/', (req,res)=>{
     res.sendFile(path.join(__dirname, 'index.html'))
