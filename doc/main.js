@@ -42,6 +42,7 @@ define(['tools', 'document'], (tools, document)=>{
         fetch_chapter_list().then(j=>{
             let target = document.getElementsByClassName('chapter_list')[0]
             render_chapter_list(j, target)
+            console.log(target)
         })
     }
 })

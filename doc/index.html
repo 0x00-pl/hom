@@ -18,8 +18,11 @@
     <body>
         <div class="chapter_list"></div>
         <script src="require.js" ></script>
-        <script>
-         define(['main'])
+        <script module-name="home">
+         define(['main'], main=>{
+             /* console.log('getting main', main)*/
+             main()
+         })
         </script>
     </body>
 </html>
