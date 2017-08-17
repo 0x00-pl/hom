@@ -4,12 +4,12 @@ const express = require('express'),
 
 let router = express.Router()
 
-router.use((req,res,next)=>{
-   console.log(req.originalUrl); // '/admin/new'
-   console.log(req.baseUrl); // '/admin'
-   console.log(req.path); // '/new'
-   next()
-})
+// router.use((req,res,next)=>{
+//    console.log(req.originalUrl); // '/admin/new'
+//    console.log(req.baseUrl); // '/admin'
+//    console.log(req.path); // '/new'
+//    next()
+// })
 
 router.get('/', (req,res)=>{
     res.sendFile(path.join(__dirname, 'index.html'))
@@ -17,7 +17,7 @@ router.get('/', (req,res)=>{
 
 router.get('/chapter_list.api', (req,res)=>{
     let files = fs.readdirSync(__dirname)
-    let md_list = files.filter(name=>name.endsWidth('.md'), encode='utf8')
+    let md_list = files.filter(name=>name.endsWith('.md'))
     res.end(JSON.stringify(md_list))
 })
 
