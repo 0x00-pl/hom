@@ -13,7 +13,11 @@ define(['tools', 'document'], (tools, document)=>{
             let text = document.createTextNode(content)
             ret.appendChild(text)
         } else {
-            content.map(v=>dom(...v)).forEach(d=>ret.appendChild(d))
+            if(content.length === 3 && typeof content[0] === 'string'){
+                ret.appendChild(dom(...content))
+            } else {
+                content.map(v=>dom(...v)).forEach(d=>ret.appendChild(d))
+            }
         }
 
         return ret
@@ -27,7 +31,7 @@ define(['tools', 'document'], (tools, document)=>{
 
     function render_chapter_list(chapter_list, target){
         let list = dom('div', {}, chapter_list.map(([name, url])=>{
-            return ['a', {href: url}, name]
+            return ['div', {}, ['a', {href: url}, name]]
         }))
         remove_all_child(target)
         target.appendChild(list)
@@ -41,7 +45,8 @@ define(['tools', 'document'], (tools, document)=>{
     return ()=>{
         fetch_chapter_list().then(j=>{
             let target = document.getElementsByClassName('chapter_list')[0]
-            render_chapter_list(j, target)
+            let chapter_list = j.map(name=>[name, 'chapter.api?name='+encodeURIComponent(name)])
+            render_chapter_list(chapter_list, target)
             console.log(target)
         })
     }
