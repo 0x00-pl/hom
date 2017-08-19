@@ -8,7 +8,7 @@ define = function (){
         script.addEventListener('load', cb)
         script.setAttribute('type', 'text/javascript')
         script.setAttribute('charset', 'utf-8')
-        // script.setAttribute('async', '')
+        script.setAttribute('async', '')
         script.setAttribute('module-name', name)
         script.setAttribute('src', url)
         body.appendChild(script)
