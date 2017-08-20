@@ -47,7 +47,6 @@ define(['tools', 'document'], (tools, document)=>{
             let target = document.getElementsByClassName('chapter_list')[0]
             let chapter_list = j.map(name=>[name, 'chapter.api?name='+encodeURIComponent(name)])
             render_chapter_list(chapter_list, target)
-            console.log(target)
         })
     }
 })

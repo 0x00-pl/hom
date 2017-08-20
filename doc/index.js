@@ -21,6 +21,12 @@ router.get('/chapter_list.api', (req,res)=>{
     res.end(JSON.stringify(md_list))
 })
 
+router.get('/chapter.api', (req,res)=>{
+    let filename = req.query.name
+    let content = fs.readFileSync(path.join(__dirname, filename))
+    res.end(content)
+})
+
 router.use(express.static(__dirname))
 
 module.exports = router
