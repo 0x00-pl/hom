@@ -53,7 +53,7 @@ define = function (){
         lib_path_list = lib_path_list.length===0 ? [''] : lib_path_list
         let timeout_each = timeout / lib_path_list.length
         let ret = resolve_single(name, lib_path_list.shift(), timeout_each)
-        lib_path_list.forEach(lib_path=>ret.catch(err=>resolve_single(name, lib_path, timeout_each)))
+        lib_path_list.forEach(lib_path=>ret=ret.catch(err=>resolve_single(name, lib_path, timeout_each)))
         return ret
     }
 
