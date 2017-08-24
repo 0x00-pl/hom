@@ -59,7 +59,7 @@ define = function (){
 
     function define(req, cb){
         cb = cb || (x=>x)
-        let loader_list = req.map(name=>resolve_single_backup(name, ['http://bad.lib/', ''], 5000))
+        let loader_list = req.map(name=>resolve_single_backup(name, define.lib_path, 5000))
         let self_dom = document.currentScript
         let self_name = self_dom.getAttribute('module-name')
         return Promise.all(loader_list).then(name_list => {
@@ -69,5 +69,6 @@ define = function (){
             self_dom.dispatchEvent(new Event('defined'))
         })
     }
+    define.lib_path = ['']
     return define
 }()
