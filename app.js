@@ -20,7 +20,9 @@ app.get('/health', (req, res)=>{
 ;[
     ['/info', info],
     ['/tping', typing],
-    ['/doc', doc]
+    ['/doc', doc],
+    ['/modules', express.static(path.join(__dirname, 'modules'))],
+    ['/puzzle1', require('./puzzle1')]
 ].forEach(([mounted, r])=>app.use(mounted, r))
 
 
