@@ -19,6 +19,8 @@
         <div class="chapter_list"></div>
         <script src="require.js" ></script>
         <script module-name="home">
+         define.cache['document'] = document
+
          define(['main'], main=>{
              /* console.log('getting main', main)*/
              main()

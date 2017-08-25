@@ -22,7 +22,7 @@ define = function (){
     }
 
     function resolve_single(name, lib_path, timeout){
-        if(cache[name] !== undefined){ return cache[name] }
+        if(cache[name] !== undefined){ return name }
         timeout = timeout || 10000
         let url = lib_path + name + '.js'
         let time_handler = null
@@ -62,13 +62,15 @@ define = function (){
         let loader_list = req.map(name=>resolve_single_backup(name, define.lib_path, 5000))
         let self_dom = document.currentScript
         let self_name = self_dom.getAttribute('module-name')
+
         return Promise.all(loader_list).then(name_list => {
             let module_list = name_list.map(name=>cache[name])
-            // console.log('define', self_name, self_dom, name_list, module_list, loader_list)
+            // console.log('define', self_name,  name_list, module_list, loader_list)
             cache[self_name] = cb(...module_list)
             self_dom.dispatchEvent(new Event('defined'))
         })
     }
     define.lib_path = ['']
+    define.cache = cache
     return define
 }()
