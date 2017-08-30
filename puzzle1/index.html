@@ -1,0 +1,72 @@
+<!doctype html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>The HTML5 Herald</title>
+        <meta name="description" content="The HTML5 Herald">
+        <meta name="author" content="SitePoint">
+
+        <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+
+        <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+        <![endif]-->
+        <style>
+         .color-box {
+             display: inline-block;
+             height: 1rem;
+             width: 1rem;
+             box-sizing: border-box;
+             border: solid 0.1rem white;
+         }
+         .color-box-dig {
+             border-radius: 35%;
+             border-color: darkgray;
+         }
+         .box {
+             display: inline-block;
+             margin: 0 1rem;
+         }
+        </style>
+    </head>
+
+    <body>
+        <div class="box">
+            <h1>0~256</h1>
+            <div class="relation_graph1"></div>
+        </div>
+        <div class="box">
+            <h1>256~1024</h1>
+            <div class="relation_graph2"></div>
+        </div>
+        <div class="box">
+            <h1>0~256 P</h1>
+            <div class="relation_pos"></div>
+        </div>
+        <div class="box">
+            <h1>0~256 N</h1>
+            <div class="relation_neg"></div>
+        </div>
+        <div> </div>
+        <div class="box">
+            <h1>0~256 T</h1>
+            <div class="relation_graph1t"></div>
+        </div>
+        <div class="box">
+            <h1>256~1024 T</h1>
+            <div class="relation_graph2t"></div>
+        </div>
+        <script src="require.js" ></script>
+        <script module-name="home">
+         define.lib_path.push('/modules/')
+         define.cache['document'] = document
+
+         define(['main'], main=>{
+             console.log('getting main', main)
+             main()
+         })
+        </script>
+    </body>
+</html>
