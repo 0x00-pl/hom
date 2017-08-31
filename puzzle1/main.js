@@ -58,9 +58,9 @@ define(['tools', 'document', 'dom-builder', 'dataset'], (tools, document, dom_bu
                 let y_list = (zeros.concat(Array.from(Number(y).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
                 let fy_list = (zeros.concat(Array.from(Number(fy).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
                 y_list.forEach((yi,i)=>fy_list.forEach((yj,j)=> {mat[i][j]+=rel(yi,yj)}))
-                console.log(Number(y).toString(2))
-                console.log(Number(fy).toString(2))
-                console.log(('00000000'+Number(y^fy).toString(2)).slice(-8))
+                // console.log(Number(y).toString(2))
+                // console.log(Number(fy).toString(2))
+                // console.log(('00000000'+Number(y^fy).toString(2)).slice(-8))
 
             }
         })
