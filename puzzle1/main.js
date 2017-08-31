@@ -85,7 +85,7 @@ define(['tools', 'document', 'dom-builder', 'dataset'], (tools, document, dom_bu
         let n3 = (n+8)
         let n4 = n3^(n3<<1)
         let n5 = (n3+32)
-        return n2 | n3&32 | n4&64 | n5&128 | n6&256
+        return n2 | n3&32 | n4&64 | n5&128
     }
     function f2(n){
         return n
