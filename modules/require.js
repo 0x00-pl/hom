@@ -64,8 +64,9 @@ define = function (){
         cb = cb || (x=>x)
         let self_dom = document.currentScript
         let self_name = self_dom.getAttribute('module-name')
-        console.log(self_dom.getAttribute('src'))
-        let loader_list = req.map(name=>resolve_single_backup(name, define.lib_path, 5000))
+        let current_path = self_dom.getAttribute('src') || ''
+        let current_dir = current_path.substr(0, current_path.lastIndexOf('/')+1)
+        let loader_list = req.map(name=>resolve_single_backup(name, Array.concat([current_dir], define.lib_path), 5000))
 
         return Promise.all(loader_list).then(name_list => {
             let module_list = name_list.map(name=>cache[name])
