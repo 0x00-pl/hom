@@ -44,24 +44,24 @@ define(['tools', 'document', 'dom-builder', 'dataset'], (tools, document, dom_bu
         return mat_avg
     }
 
-    function bit_relation(xy_list, [x_width, y_width], idx, pos_neg, f, rel){
+    function bit_relation(xy_list, [x_width, y_width], idx, pos_neg, fa, fb, rel){
         let v = pos_neg ? 1 : -1
         let zeros = new Array(Math.max(x_width, y_width)).fill(0)
         let mat = new Array(y_width).fill(0).map(()=>new Array(y_width).fill(0))
         let count = 0
         xy_list.forEach(([x, y])=>{
-            let fy = f(y)
+            let a = fa(y)
+            let b = fb(y)
             let x_list = (zeros.concat(Array.from(Number(x).toString(2)))).map(n=>(n*2-1)).slice(-x_width)
             let t = x_list[(x_width+idx)%x_width]
             if(t==v){
                 count += 1
-                let y_list = (zeros.concat(Array.from(Number(y).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
-                let fy_list = (zeros.concat(Array.from(Number(fy).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
-                y_list.forEach((yi,i)=>fy_list.forEach((yj,j)=> {mat[i][j]+=rel(yi,yj)}))
+                let a_list = (zeros.concat(Array.from(Number(a).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
+                let b_list = (zeros.concat(Array.from(Number(b).toString(2)))).map(n=>(n*2-1)).slice(-y_width)
+                a_list.forEach((ai,i)=>b_list.forEach((bj,j)=> {mat[i][j]+=rel(ai,bj)}))
                 // console.log(Number(y).toString(2))
                 // console.log(Number(fy).toString(2))
                 // console.log(('00000000'+Number(y^fy).toString(2)).slice(-8))
-
             }
         })
         let mat_avg = mat.map(line=>line.map(n=>n/count))
@@ -81,13 +81,18 @@ define(['tools', 'document', 'dom-builder', 'dataset'], (tools, document, dom_bu
 
     function f1(n){
         n = Number(n)-3
-        return n
+        let n2 = ((n&31)^((n&(8))<<1))
+        let n3 = (n+8)
+        let n4 = n3^(n3<<1)
+        let n5 = (n3+32)
+        return n2 | n3&32 | n4&64 | n5&128 | n6&256
     }
     function f2(n){
         return n
     }
     function fid(n){return n}
-    function fbit(n){return n-3}
+    function fbit(n){return (n+3)<<9}
+    function fxorshl(n){return (fbit()<<2)&(fbit(n<<1))}
 
     return ()=>{
         console.log(JSON.stringify(dataset.slice(0,10)))
@@ -100,7 +105,7 @@ define(['tools', 'document', 'dom-builder', 'dataset'], (tools, document, dom_bu
         // console.log(JSON.stringify(dataset.slice(0,10).map(line=>line.map(n=>f1(Number(n)).toString(2)))))
         render_box('relation_graph2t', data_relation(dataset.slice(256, 1024), [25,25], f2))
 
-        render_box('relation_pos', bit_relation(dataset.slice(3,256), [25,25], -4, true, fbit, bit_xor))
-        render_box('relation_neg', bit_relation(dataset.slice(3,256), [25,25], -4, false, fbit, bit_xor))
+        render_box('relation_pos', bit_relation(dataset.slice(4,256), [25,25], -9, true, fbit, fbit, bit_xor))
+        render_box('relation_neg', bit_relation(dataset.slice(4,256), [25,25], -9, false, fbit, fbit, bit_xor))
     }
 })

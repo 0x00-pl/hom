@@ -5,7 +5,7 @@ define = function (){
     function load_script(name, url, cb, error_cb){
         let body = document.getElementsByTagName('head')[0]
         let script = document.createElement('script')
-        script.addEventListener('load', cb)
+        script.addEventListener('defined', cb)
         script.addEventListener('error', error_cb)
         script.setAttribute('type', 'text/javascript')
         script.setAttribute('charset', 'utf-8')
@@ -34,10 +34,8 @@ define = function (){
             load_script(
                 name, url,
                 (ev)=>{
-                    ev.target.addEventListener('defined', ()=>{
-                        clearTimeout(time_handler)
-                        resolve(name)
-                    })
+                    clearTimeout(time_handler)
+                    resolve(name)
                 },
                 (ev)=>{
                     reject('load script error')
@@ -70,9 +68,11 @@ define = function (){
 
         return Promise.all(loader_list).then(name_list => {
             let module_list = name_list.map(name=>cache[name])
-            // console.log('define', self_name,  name_list, module_list, loader_list)
+            //console.log('define', self_name,  name_list, module_list, loader_list)
             cache[self_name] = cb(...module_list)
-            self_dom.dispatchEvent(new Event('defined'))
+            let ev = document.createEvent('Event')
+            ev.initEvent('defined', true, true)
+            self_dom.dispatchEvent(ev)
         })
     }
     define.lib_path = ['']
