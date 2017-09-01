@@ -22,7 +22,8 @@ app.get('/health', (req, res)=>{
     ['/tping', typing],
     ['/doc', doc],
     ['/modules', express.static(path.join(__dirname, 'modules'))],
-    ['/puzzle1', require('./puzzle1')]
+    ['/puzzle1', require('./puzzle1')],
+    ['/tree_parser', require('./tree_parser')]
 ].forEach(([mounted, r])=>app.use(mounted, r))
 
 
