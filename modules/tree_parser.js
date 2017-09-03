@@ -2,7 +2,8 @@ define([], ()=>{
     function str_with_tag(tag, str){
         let ret = Object.create(String.prototype)
         function toString(){ return this.str }
-        return Object.assign(ret, { tag, str, toString })
+        function valueOf(){ return this.str }
+        return Object.assign(ret, { tag, str, toString, valueOf })
     }
 
     function tagging_comment(str){
@@ -34,9 +35,39 @@ define([], ()=>{
         return ret
     }
 
+    function tree_parse(str_with_tag_list){
+        let tokens = str_with_tag.reduce((acc,v)=>{
+            if(v.tag != 'any') {
+                return acc.concat(v)
+            } else {
+                let tag = v.tag
+                let seplited_1 = v.str.split(/(?=\(|\))/)
+                let seplited = seplited_1.reduce((acc,v)=>{
+                    if(v.startsWith('(') || v.startsWith(')')){
+                        return acc.concat(str_with_tag('level-change', v[0]), str_with_tag(tag, v.substr(1)))
+                    } else {
+                        return acc.concat(str_with_tag(v))
+                    }
+                }, [])
+                return acc.concat(seplited)
+            }
+        }, [])
 
+        function make_ast(tokens){
+            let ret_reverse = []
+            while(true){
+                let last = tokens.pop()
+                if(last == undefined || last == '('){
+                    break
+                }if(last == ')'){
+                    ret_reverse.push(make_ast(tokens))
+                } else {
+                    ret_reverse.push(last)
+                }
+            }
+            return ret_reverse.reverse()
+        }
 
-    function tree_parse(str, commonts){
-        
+        return make_ast(tokens)
     }
 })
