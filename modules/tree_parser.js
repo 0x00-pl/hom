@@ -35,7 +35,51 @@ define([], ()=>{
         return ret
     }
 
-    function tree_parse(str_with_tag_list){
+    function tagging_string(str_with_tag_list){
+        let tokens = str_with_tag_list.map(block=>{
+            if(block.tag != 'any'){ return block}
+            let s = block.str
+            let ret = []
+
+            function find_str_end(str, base){
+                while(true){
+                    let p = str.indexof('"', base)
+                    if(p == -1){
+                        return -1
+                    } else if(str[p-1] != '\\'){
+                        return p
+                    } else {
+                        base = p + 1
+                    }
+                }
+            }
+
+            while(true){
+                let str_beg = s.indexOf('"')
+                if(str_beg == -1){
+                    if(s != ''){ ret.push(str_with_tag('any', s)) }
+                    break
+                }
+                if(str_beg != 0){
+                    ret.push(str_with_tag('any', s.substr(0, str_beg)))
+                }
+
+                let str_end = find_str_end(s, str_beg)
+                if(str_end == -1){
+                    ret.push(str_with_tag('string', s.substr(str_beg)+'"'))
+                    break
+                } else {
+                    ret.push(str_with_tag('string', s.substr(str_beg, str_end+1)))
+                    s = s.substr(str_end+1)
+                }
+            }
+
+            return ret
+        })
+        return [].concat(tokens)
+    }
+
+    function tokens_to_ast(str_with_tag_list){
         let tokens = str_with_tag.reduce((acc,v)=>{
             if(v.tag != 'any') {
                 return acc.concat(v)
@@ -70,4 +114,13 @@ define([], ()=>{
 
         return make_ast(tokens)
     }
-})
+
+    function tree_parse(str){
+        let t1 = tagging_comment(str)
+        let t2 = tagging_string(t1)
+        let t3 = tokens_to_ast(t2)
+        return t3
+    }
+
+    return tree_parse
+}
