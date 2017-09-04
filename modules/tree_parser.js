@@ -76,21 +76,26 @@ define([], ()=>{
 
             return ret
         })
-        return [].concat(tokens)
+        return [].concat(...tokens)
     }
 
     function tokens_to_ast(str_with_tag_list){
-        let tokens = str_with_tag.reduce((acc,v)=>{
+        let tokens = str_with_tag_list.reduce((acc,v)=>{
             if(v.tag != 'any') {
-                return acc.concat(v)
+                acc.push(v)
+                return acc
             } else {
                 let tag = v.tag
                 let seplited_1 = v.str.split(/(?=\(|\))/)
-                let seplited = seplited_1.reduce((acc,v)=>{
-                    if(v.startsWith('(') || v.startsWith(')')){
-                        return acc.concat(str_with_tag('level-change', v[0]), str_with_tag(tag, v.substr(1)))
+                let seplited = seplited_1.reduce((acc,s)=>{
+                    if(s.startsWith('(') || s.startsWith(')')){
+                        if(s.length > 1){
+                            return acc.concat(str_with_tag('level-change', s[0]), str_with_tag(tag, s.substr(1)))
+                        } else {
+                            return acc.concat(str_with_tag('level-change', s))
+                        }
                     } else {
-                        return acc.concat(str_with_tag(v))
+                        return acc.concat(str_with_tag(tag, s))
                     }
                 }, [])
                 return acc.concat(seplited)
@@ -111,16 +116,41 @@ define([], ()=>{
             }
             return ret_reverse.reverse()
         }
-
         return make_ast(tokens)
+    }
+
+    function split_tokens_with_space(tree){
+        if(tree instanceof Array){
+            return tree.reduce((acc,v)=>{
+                if(v.tag == 'any'){
+                    let block = v.str
+                    let tokens = block.split(/[ \n\t\r]/).filter(t=>t!='').map(t=>str_with_tag('any', t))
+                    return acc.concat(tokens)
+                } else {
+                    acc.push(v)
+                    return acc
+                }
+            }, [])
+        } else {
+            return tree
+        }
+    }
+
+    function show_tree(tree){
+        if(tree instanceof Array){
+            return ['(', ')'].join(tree.map(show_tree).join(' '))
+        } else {
+            return tree.toString()
+        }
     }
 
     function tree_parse(str){
         let t1 = tagging_comment(str)
         let t2 = tagging_string(t1)
         let t3 = tokens_to_ast(t2)
-        return t3
+        let t4 = split_tokens_with_space(t3)
+        return t4
     }
 
-    return tree_parse
-}
+    return { tree_parse, show_tree }
+})
