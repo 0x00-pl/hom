@@ -1,12 +1,14 @@
-const express = require('express'),
+let express = require('express'),
       path = require('path')
 
 
-let app = express.Router()
+let router = express.Router()
 
-app.get('/', (req, res)=>{
-    res.redirect(req.baseUrl+'/index.html')
-})
-app.use(express.static(__dirname))
+// app.get('/', (req, res)=>{
+//     res.redirect(req.baseUrl+'/index.html')
+// })
 
-module.exports = app
+router.use(express.static(__dirname))
+
+module.exports = router
+

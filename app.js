@@ -19,7 +19,7 @@ app.get('/health', (req, res)=>{
 
 ;[
     ['/info', info],
-    ['/tping', typing],
+    ['/typing', typing],
     ['/doc', doc],
     ['/modules', express.static(path.join(__dirname, 'modules'))],
     ['/puzzle1', require('./puzzle1')],
