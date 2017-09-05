@@ -145,11 +145,11 @@ define([], ()=>{
     }
 
     function tree_parse(str){
-        let t1 = tagging_comment(str)
-        let t2 = tagging_string(t1)
-        let t3 = tokens_to_ast(t2)
-        let t4 = split_tokens_with_space(t3)
-        return t4
+        let t = tagging_comment(str)
+        t = tagging_string(t)
+        t = tokens_to_ast(t)
+        t = split_tokens_with_space(t)
+        return t
     }
 
     return { tree_parse, show_tree }

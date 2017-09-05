@@ -20,14 +20,23 @@
     <body>
         <h1>TreeParser</h1>
         <div class="display"></div>
+        <div class="display_json"></div>
         <script module-name="home">
          define.lib_path.push('/modules/')
 
          define(['tree_parser'], (tree_parser)=>{
-             let tree = tree_parser.tree_parse('(lambda (*add a and b*)(a b)(+ a b))')
+             /* let str = '(lambda (*add a and b*)(a b)(+ a b))'*/
+             let str = '(lambda (*add a and b*)(a b)(+ a b))'
+             let tree = tree_parser.tree_parse(str)
              let display = document.getElementsByClassName('display')[0]
+             let display_json = document.getElementsByClassName('display_json')[0]
+
+             let json = JSON.stringify(tree)
              let text = tree.map(tree_parser.show_tree)
+
              display.textContent = text
+             display_json.textContent = json
+
              console.log(tree, tree.map(tree_parser.show_tree))
          })
         </script>
