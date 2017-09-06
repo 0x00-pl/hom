@@ -18,20 +18,36 @@ define(['document'], (document)=>{
 
     let notify_handlers = {
         set(o,p,v){
-            if(n.startsWith('__')){ return false }
             if(o[p]===v){ return true }
-            let hv = hook_obj_rec(v, notify_handlers)
-            o[p] = hv
-            ;(o.__set[p]||[]).forEach(x=>x.update())
+            if(!p.startsWith('__')){
+                o.__set = o.__set || {}
+                let hv = hook_obj_rec(v, notify_handlers)
+                let funcs = o.__set[p] || []
+                funcs.forEach(f=>f(v))
+                o[p] = hv
+            } else {
+                o[p] = v
+            }
             return true
         },
         get(o,p){
-            if(p.startsWith('__')){ return undefined }
+            // if(p.startsWith('__')){ return undefined }
             return o[p]
         }
     }
 
-    function obj_pipe_dom(obj, dom){
-        obj.onchange = function(value){dom.value = value}
+    function obj_pipe_dom(obj, name, dom, prop){
+        obj.__set = obj.__set || {}
+        obj.__set[name] = [].concat((obj.__set[name]||[]), [(v)=>{dom[prop]=v}])
+
+        return obj
+
+        // if(obj instanceof Proxy){
+        //     return obj
+        // } else {
+        //     return hook_obj_rec(obj, notify_handlers)
+        // }
     }
+
+    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom }
 })

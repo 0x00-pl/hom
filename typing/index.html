@@ -26,11 +26,15 @@
             </div>
             <input id="entry" name="" type="text" value=""/>
         </main>
-        <script src="/modules/require.js"></script>
         <script module-name="index">
-         define(['main', 'dom-bind'], (main, dom_bind)=>{
-
-
+         define.cache['document'] = document
+         define(['dom-bind'], (dom_bind)=>{
+             let root = { value: '123' }
+             root = dom_bind.hook_obj_rec(root, dom_bind.notify_handlers)
+             let words = document.getElementById('words')
+             dom_bind.obj_pipe_dom(root, 'value', words, 'textContent')
+             root.value = '456'
+             console.log(root)
          })
         </script>
     </body>
