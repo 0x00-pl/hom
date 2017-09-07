@@ -24,6 +24,9 @@
             <div id="words">
                 test words 123
             </div>
+            <div id="pl_bind_test" pl_binds="{ 'textContent': 'tc' , 'value':value}">
+                undefined
+            </div>
             <input id="entry" name="" type="text" value=""/>
         </main>
         <script module-name="index">
@@ -35,6 +38,17 @@
              dom_bind.obj_pipe_dom(root, 'value', words, 'textContent')
              root.value = '456'
              console.log(root)
+
+
+             let pl_bind_test_obj = {tc:1}
+             let pl_bind_test_dom = document.getElementById('pl_bind_test')
+             let pl_binded_test_obj = dom_bind.obj_bind_to_dom(pl_bind_test_obj, pl_bind_test_dom)
+             pl_binded_test_obj.tc = 2
+
+             let pl_dom_bind_dom = document.getElementById('entry')
+             dom_bind.dom_bind_to_functions(pl_dom_bind_dom, {
+                 value: (mutation)=>{console.log('mutation value cb: ', mutation)}
+             })
          })
         </script>
     </body>

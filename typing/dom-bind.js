@@ -49,5 +49,67 @@ define(['document'], (document)=>{
         // }
     }
 
-    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom }
+    function fake_env_eval(code){
+        let window = {}, global = {}, module = {}
+
+        window = new Proxy({}, {
+            set(o, name, value){
+                console.log('capture set:', name, value)
+                o[name]=value
+                return true
+            },
+            get(o, name){
+                // console.log('capture get: ', name)
+                return undefined // disable all access
+            },
+            has(o, name){
+                if(name === 'eval' || name === 'code'){ return false }
+                return true // disable all access
+            }
+        })
+
+        with(window){
+            return eval(code)
+        }
+    }
+
+    function obj_bind_to_dom(obj, dom){
+        let dom_attr_str = dom.getAttribute('pl_binds')
+        let bind_dict = fake_env_eval(';('+dom_attr_str+');')
+        let bind_dict_rev = Object.entries(bind_dict).reduce((acc,[k,v])=>{
+            acc[v] = acc[v] || []
+            acc[v].push(k)
+            return acc
+        }, {})
+        let new_obj = new Proxy(obj, {
+            set(o, name, value){
+                o[name] = value
+                if(bind_dict_rev[name] != undefined){
+                    bind_dict_rev[name].map(attr=>{dom[attr]=value})
+                }
+            }
+        })
+        return new_obj
+    }
+
+    function dom_bind_to_functions(dom, functions){
+        let observer = new MutationObserver(function(mutations) {
+            console.log('on observe')
+            mutations.forEach(function(mutation) {
+                let attr_name = mutation.attributeName
+                console.log(mutation.type, attr_name, mutation.target[attr_name])
+                // if(functions[attr_name]){
+                //     functions[attr_name](mutation)
+                // }
+            })
+        })
+        let config = { attributes: true, characterData: true }
+
+        observer.observe(dom, config)
+        console.log('observe')
+        dom.value = 1234
+        dom.setAttribute('vattr', 1234)
+    }
+
+    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions }
 })
