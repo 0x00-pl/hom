@@ -45,9 +45,9 @@
              let pl_binded_test_obj = dom_bind.obj_bind_to_dom(pl_bind_test_obj, pl_bind_test_dom)
              pl_binded_test_obj.tc = 2
 
-             let pl_dom_bind_dom = document.getElementById('entry')
+             let pl_dom_bind_dom = document.getElementById('entry').parentElement
              dom_bind.dom_bind_to_functions(pl_dom_bind_dom, {
-                 value: (mutation)=>{console.log('mutation value cb: ', mutation)}
+                 keypress(ev){console.log('kpress ev: ', ev)},
              })
          })
         </script>

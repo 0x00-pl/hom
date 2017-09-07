@@ -93,22 +93,28 @@ define(['document'], (document)=>{
     }
 
     function dom_bind_to_functions(dom, functions){
-        let observer = new MutationObserver(function(mutations) {
-            console.log('on observe')
-            mutations.forEach(function(mutation) {
-                let attr_name = mutation.attributeName
-                console.log(mutation.type, attr_name, mutation.target[attr_name])
-                // if(functions[attr_name]){
-                //     functions[attr_name](mutation)
-                // }
-            })
+        Object.entries(functions).forEach(([k,v])=>{
+            dom.addEventListener(k, v)
         })
-        let config = { attributes: true, characterData: true }
 
-        observer.observe(dom, config)
-        console.log('observe')
-        dom.value = 1234
-        dom.setAttribute('vattr', 1234)
+
+        //     // can't do
+        // let observer = new MutationObserver(function(mutations) {
+        //     console.log('on observe')
+        //     mutations.forEach(function(mutation) {
+        //         let attr_name = mutation.attributeName
+        //         console.log(mutation.type, attr_name, mutation.target[attr_name])
+        //         // if(functions[attr_name]){
+        //         //     functions[attr_name](mutation)
+        //         // }
+        //     })
+        // })
+        // let config = { attributes: true, childList: true, characterData: true, subtree: true, attributeFilter:['value', 'vattr'] }
+
+        // observer.observe(dom, config)
+        // console.log('observe')
+        // dom.value = 1234
+        // dom.setAttribute('vattr', 1234)
     }
 
     return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions }
