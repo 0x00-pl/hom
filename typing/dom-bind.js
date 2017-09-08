@@ -1,4 +1,12 @@
 define(['document'], (document)=>{
+    function rev_dict(obj){
+        return Object.entries(obj).reduce((acc,[k,v])=>{
+            acc[v] = acc[v] || []
+            acc[v].push(k)
+            return acc
+        }, {})
+    }
+
     function hook_obj(obj, handles){
         handles = handles || {}
         return new Proxy(obj, handles)
@@ -74,13 +82,12 @@ define(['document'], (document)=>{
     }
 
     function obj_bind_to_dom(obj, dom){
+
         let dom_attr_str = dom.getAttribute('pl_binds')
-        let bind_dict = fake_env_eval(';('+dom_attr_str+');')
-        let bind_dict_rev = Object.entries(bind_dict).reduce((acc,[k,v])=>{
-            acc[v] = acc[v] || []
-            acc[v].push(k)
-            return acc
-        }, {})
+        if(!dom_attr_str){ return obj }
+        // let bind_dict = fake_env_eval(';('+dom_attr_str+');')
+        let bind_dict = JSON.parse(dom_attr_str)
+        let bind_dict_rev = rev_dict(bind_dict)
         let new_obj = new Proxy(obj, {
             set(o, name, value){
                 o[name] = value
@@ -92,30 +99,32 @@ define(['document'], (document)=>{
         return new_obj
     }
 
+    function dom_bind_to_obj(dom, obj){
+        let dom_attr_str = dom.getAttribute('pl_events')
+        if(dom_attr_str == undefined){ return }
+        let bind_dict = JSON.parse(dom_attr_str)
+        if(bind_dict instanceof Array){
+            bind_dict.forEach(name=>{
+                dom.addEventListener(name, obj[name])
+            })
+        } else {
+            let bind_dict_rev = rev_dict(bind_dict)
+            Object.entries(bind_dict_rev).forEach(([k,v])=>{
+                dom.addEventListener(k, obj[v])
+            })
+        }
+    }
+
     function dom_bind_to_functions(dom, functions){
         Object.entries(functions).forEach(([k,v])=>{
             dom.addEventListener(k, v)
         })
-
-
-        //     // can't do
-        // let observer = new MutationObserver(function(mutations) {
-        //     console.log('on observe')
-        //     mutations.forEach(function(mutation) {
-        //         let attr_name = mutation.attributeName
-        //         console.log(mutation.type, attr_name, mutation.target[attr_name])
-        //         // if(functions[attr_name]){
-        //         //     functions[attr_name](mutation)
-        //         // }
-        //     })
-        // })
-        // let config = { attributes: true, childList: true, characterData: true, subtree: true, attributeFilter:['value', 'vattr'] }
-
-        // observer.observe(dom, config)
-        // console.log('observe')
-        // dom.value = 1234
-        // dom.setAttribute('vattr', 1234)
     }
 
-    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions }
+    function bind_all(dom, obj){
+        let new_obj = obj_bind_to_dom(obj, dom)
+        dom_bind_to_obj(dom, new_obj)
+    }
+
+    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions, dom_bind_to_obj, bind_all }
 })
