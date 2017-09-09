@@ -1,0 +1,18 @@
+let r3 =  /^(((1(01*0)*1)|0)*)$/
+
+<--- Last few GCs --->
+
+[6146:0x557b2d4e2b90]   136715 ms: Mark-sweep 1404.4 (1459.5) -> 1404.3 (1434.5) MB, 2698.9 / 0.0 ms  (+ 0.0 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of marking 2700 ms) last resort 
+[6146:0x557b2d4e2b90]   139251 ms: Mark-sweep 1404.3 (1434.5) -> 1404.4 (1434.5) MB, 2534.0 / 0.0 ms  last resort 
+
+
+<--- JS stacktrace --->
+
+==== JS stack trace =========================================
+
+    2: arguments adaptor frame: 3->1
+Security context: 0x1e63d571cef1 <JSObject>
+    3: map(this=0x24160a33fe9 <JSArray[2]>)
+    4: pop_relatate [/home/pl/github/home/puzzle2/main.js:~90] [pc=0x7739e03901c](this=0x3c9f1709041 <JSGlobal Object>,exp=0xfc74ef132e9 <JSArray[3]>,a=0x89b96b5d7e9 <Object map = 0x1833300cd209>)
+    5: pop_relatate [/home/pl/github/home/puzzle2/main.js:~90] [pc=0x7739e0381e9](this=0x3c9f1709041 <JSGlobal Object>,e...
+

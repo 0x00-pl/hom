@@ -1,8 +1,4 @@
 
-// normal form:
-// (0a+1b)
-// 01(01*)10(10(10)*a + 10(10)*b)
-// 0(10)*10(1010)
 
 function mk_node(name, exp){
     return {
@@ -21,7 +17,7 @@ function exp_toString(exp){
 function exp_concat(prefix, p){
     if(prefix.length == 1){ return p }
     if(p.length == 1){ return prefix }
-    if(p[0] == prefix[0]){
+    if(p[0] == prefix[0] && prefix[0] == ''){
         return prefix.concat(p.slice(1))
     } else {
         return prefix.concat([p])
@@ -29,6 +25,14 @@ function exp_concat(prefix, p){
 }
 
 function exp_union(exp_list){
+    exp_list = exp_list.filter(e=>{
+        if(e instanceof Array && e.length==1){
+            return false
+        } else {
+            return true
+        }
+    })
+
     if(exp_list.length == 0){
         return ['']
     } else if(exp_list.length == 1){
@@ -48,171 +52,176 @@ function exp_add_star(exp){
     }
 }
 
-function has_env(exp){
-    return exp instanceof Array && exp[exp.length-1] instanceof Array &&
-        exp[exp.length-1][exp[exp.length-1].length-1].name
-}
-
-function expand(exp){
-    if(has_env(exp[exp.length-1])){
-        let prefix = exp.slice(0, exp.length-1)
-        let plus = exp[exp.length-1].slice(1)
-        return plus.map(p=>exp_concat(prefix, p))
-    } else {
-        return [exp]
-    }
-}
-
-function exp_split(prefix, r_list){
-    if(r_list.length == 0){ return prefix }
-    return r_list.map(r=>exp_concat(prefix, r))
+function exp_group(exp_list, a){
+    let witha = [], withouta = []
+    exp_list.forEach(p=>{
+        if(p[p.length-1] == a){
+            let new_p = p.slice(0, p.length-1)
+            witha.push(new_p)
+        } else {
+            withouta.push(p)
+        }
+    })
+    return [witha, withouta]
 }
 
 function elimit_replace(exp, a){
-    if(has_env(exp[exp.length-1])){
-        let prefix = exp.slice(0, exp.length-1)
-        let plus = exp[exp.length-1].slice(1)
-        let witha = [], withouta = []
-        plus.forEach(p=>{
-            if(p[p.length-1] == a){
-                let new_p = p.slice(0, p.length-1)
-                witha.push(new_p)
-            } else {
-                withouta.push(p)
-            }
-        })
-        let p1 = exp_union(witha)
-        let aexp_list = expand(a.exp)
-        let pa_list = exp_split(p1, aexp_list)
-        let new_plus = exp_union(withouta.concat(pa_list))
-        return exp_concat(prefix, new_plus)
-    } else if(has_env(exp)){
-        let plus = exp.slice(1)
-        let witha = [], withouta = []
-        plus.forEach(p=>{
-            if(p[p.length-1] == a){
-                let new_p = p.slice(0, p.length-1)
-                witha.push(new_p)
-            } else {
-                withouta.push(p)
-            }
-        })
-        let p1 = exp_union(witha)
-        let aexp_list = expand(a.exp)
-        let pa_list = exp_split(p1, aexp_list)
-        return exp_union(withouta.concat(pa_list))
+    if(!(exp instanceof Array)){ return exp }
+    if(exp[0] == '+'){
+        // group by if endsWith a
+        let [witha, withouta] = exp_group(exp.slice(1), a)
+        // console.log('with?: ', witha, withouta)
+        // replace each without a
+        withouta = withouta.map(e=>elimit_replace(e, a))
+        // replace a, rebuild up
+        let witha_exp = exp_union(witha)
+        let endsa = witha_exp.length==1 ? ['+'] : exp_concat(witha_exp, a.exp)
+        let each = endsa[0]=='+' ? endsa.slice(1) : [endsa]
+        // console.log('ob1c: ', each, withouta)
+        return ['+'].concat(each, withouta)
     } else {
-        return exp
+        // replace each
+        let each = exp.slice(1).map(e=>elimit_replace(e, a))
+        // concat each
+        return [''].concat(each)
+    }
+}
+
+function pop_relatate(exp, a){
+    if(!(exp instanceof Array)){ return exp==a ? [[['']], ['']] : [[], exp] }
+    if(exp[0] == '+'){
+        // pop relate each
+        let r_list = exp.slice(1).map(e=>pop_relatate(e, a))
+        // merge all
+        let rela_list = []
+        let other_list = []
+        r_list.map(([r,o])=>{
+            rela_list = rela_list.concat(r)
+            other_list.push(o)
+        })
+        return [rela_list, exp_union(other_list)]
+    } else {
+        // split prefix and last
+        let prefix = exp.slice(0, exp.length-1)
+        let last = exp[exp.length-1]
+        // last pop_relatate
+        let [rela_list, other] = pop_relatate(last, a)
+        // concat prefix and union(last_relatate)
+        let r = rela_list.length==0 ? [] : [exp_concat(prefix, exp_union(rela_list))]
+        let o = other.length<=1 ? [''] : exp_concat(prefix, other)
+        // return
+        return [r, o]
     }
 }
 
 function elimit_rec(exp, a){
-    if(has_env(exp[exp.length-1])){
-        let prefix = exp.slice(0, exp.length-1)
-        let plus = exp[exp.length-1].slice(1)
-        let witha = [], withouta = []
-        plus.forEach(p=>{
-            if(p[p.length-1] == a){
-                let new_p = p.slice(0, p.length-1)
-                witha.push(new_p)
-            } else {
-                withouta.push(p)
-            }
-        })
-        let all1 = exp_concat(prefix, exp_union(witha))
-        let all2 = exp_concat(prefix, exp_union(withouta))
-        let all = exp_concat(exp_add_star(all1), all2)
-        return all
-    } else if(has_env(exp)){
-        let plus = exp.slice(1)
-        let witha = []
-        let withouta = []
-        plus.forEach(p=>{
-            if(p[p.length-1] == a){
-                let new_p = p.slice(0, p.length-1)
-                witha.push(new_p)
-            } else {
-                withouta.push(p)
-            }
-        })
-        let all1 = exp_union(witha)
-        // console.log('with/out: ', witha, withouta)
-        let all2 = exp_union(withouta)
-        console.log('all: ',  all1, exp_add_star(all1))
-        let all = exp_concat(exp_add_star(all1), all2)
-        return all
-    } else {
-        return exp
-    }
+    // pop all endsWith a
+    let [r, o] = pop_relatate(exp, a)
+    // rebuild up
+    let prefix_star = exp_add_star(exp_union(r))
+    return exp_concat(prefix_star, o)
 }
 
 
-// function elimit_replace(exp, a){
-//     // console.log('e node: ', a.name, exp)
-//     let prefix_list = []
-//     if(exp[0] == '+'){
-//         prefix_list = exp.slice(1)
+// function has_env(exp){
+//     return exp instanceof Array && exp[exp.length-1] instanceof Array &&
+//         exp[exp.length-1][exp[exp.length-1].length-1].name
+// }
+
+// function expand(exp){
+//     if(has_env(exp[exp.length-1])){
+//         let prefix = exp.slice(0, exp.length-1)
+//         let plus = exp[exp.length-1].slice(1)
+//         return plus.map(p=>exp_concat(prefix, p))
 //     } else {
-//         prefix_list = [exp]
+//         return [exp]
 //     }
-//     let lines_list = prefix_list.map(prefix=>{
+// }
 
-//         // console.log('prefix: ', prefix )
-//         if(prefix[prefix.length-1] == a){
-//             // replace a
-//             let plus_list = a.exp[0]=='+' ? a.exp.slice(1) : [a.exp]
-//             return plus_list.map(plus=>exp_concat(prefix.slice(0, prefix.length-1), plus))
-//         } else {
-//             return [prefix]
-//         }
-//     })
-//     let lines = [].concat(...lines_list)
-//     return lines.length==1 ? lines[0] : ['+'].concat(lines)
+// function exp_split(prefix, r_list){
+//     if(r_list.length == 0){ return prefix }
+//     return r_list.map(r=>exp_concat(prefix, r))
 // }
 
 // function elimit_replace(exp, a){
-//     if(exp.name) { return exp }
-//     if(exp instanceof String) { return exp }
-//     let ret = []
-//     exp.forEach(e=>{
-//         e = elimit_replace(e, a)
-//         if(e instanceof Array && e[0]==exp[0]){
-//             ret = ret.concat(e.slice(1))
-//         } else {
-//             ret.push(e)
-//         }
-//     })
-//     return ret
+//     if(has_env(exp[exp.length-1])){
+//         let prefix = exp.slice(0, exp.length-1)
+//         let plus = exp[exp.length-1].slice(1)
+//         let witha = [], withouta = []
+//         plus.forEach(p=>{
+//             if(p[p.length-1] == a){
+//                 let new_p = p.slice(0, p.length-1)
+//                 witha.push(new_p)
+//             } else {
+//                 withouta.push(p)
+//             }
+//         })
+//         let p1 = exp_union(witha)
+//         let aexp_list = expand(a.exp)
+//         let pa_list = exp_split(p1, aexp_list)
+//         let new_plus = exp_union(withouta.concat(pa_list))
+//         return exp_concat(prefix, new_plus)
+//     } else if(has_env(exp)){
+//         let plus = exp.slice(1)
+//         let witha = [], withouta = []
+//         plus.forEach(p=>{
+//             if(p[p.length-1] == a){
+//                 let new_p = p.slice(0, p.length-1)
+//                 witha.push(new_p)
+//             } else {
+//                 withouta.push(p)
+//             }
+//         })
+//         let p1 = exp_union(witha)
+//         let aexp_list = expand(a.exp)
+//         let pa_list = exp_split(p1, aexp_list)
+//         return exp_union(withouta.concat(pa_list))
+//     } else {
+//         return exp
+//     }
 // }
-
 
 // function elimit_rec(exp, a){
-//     let lines = exp[0]=='+' ? exp.slice(1) : [exp]
-//     let [witha, withouta] = [[], []]
-//     lines.forEach(line=>{
-//         if(line[line.length-1] == a){
-//             witha.push(line.slice(0, line.length-1))
-//         } else {
-//             withouta.push(line)
-//         }
-//     })
-//     // console.log('with/out?', exp_toString(exp), witha.map(exp_toString), withouta.map(exp_toString))
-//     let r_list = []
-//     if(witha.length>0){
-//         let witha_exp = witha.length==1 ? witha[0] : ['+'].concat(witha)
-//         witha_exp = exp_concat(witha_exp.length==2 ? witha_exp : ['', witha_exp], '*')
-//         if(withouta.length>0){
-//             r_list = withouta.map(p=>exp_concat(witha_exp, p))
-//         } else {
-//             r_list = [witha_exp]
-//         }
+//     if(has_env(exp[exp.length-1])){
+//         let prefix = exp.slice(0, exp.length-1)
+//         let plus = exp[exp.length-1].slice(1)
+//         let witha = [], withouta = []
+//         plus.forEach(p=>{
+//             if(p[p.length-1] == a){
+//                 let new_p = p.slice(0, p.length-1)
+//                 witha.push(new_p)
+//             } else {
+//                 withouta.push(p)
+//             }
+//         })
+//         let all1 = exp_concat(prefix, exp_union(witha))
+//         let all2 = exp_concat(prefix, exp_union(withouta))
+//         let all = exp_concat(exp_add_star(all1), all2)
+//         return all
+//     } else if(has_env(exp)){
+//         let plus = exp.slice(1)
+//         let witha = []
+//         let withouta = []
+//         plus.forEach(p=>{
+//             if(p[p.length-1] == a){
+//                 let new_p = p.slice(0, p.length-1)
+//                 witha.push(new_p)
+//             } else {
+//                 withouta.push(p)
+//             }
+//         })
+//         let all1 = exp_union(witha)
+//         // console.log('with/out: ', witha, withouta)
+//         let all2 = exp_union(withouta)
+//         console.log('all: ',  all1, exp_add_star(all1))
+//         let all = exp_concat(exp_add_star(all1), all2)
+//         return all
 //     } else {
-//         r_list = withouta
+//         return exp
 //     }
-//     return r_list.length==1 ? r_list[0] : ['+'].concat(r_list)
 // }
 
-let debug = 1
+let debug = 0
 
 function elimit_node(node_list, a){
     // replace all e in node_list
@@ -244,7 +253,7 @@ function to_regex(n){
     nodes.forEach((node, i)=>{
         node.exp = ['+', ['', 0, nodes[(i*2)%n]], ['', 1, nodes[(i*2+1)%n]]]
     })
-    let str = exp_toString(elimit(nodes.reverse()))
+    let str = exp_toString(elimit(nodes.reverse())).replace(/\((\d)\)/g, `$1`)
     let reg = '/^'+str.replace(/\+/g, '|')+'$/'
     return reg
 }
@@ -258,8 +267,8 @@ function to_regex(n){
 // // b.exp = ['+', ['', ['', 0,1,'*',0,1], '*', 0,1,'*',0,0, b], ['', ['', 0,1,'*',0,1],'*',1,a]]
 
 // console.log(exp_toString(elimit([c, b, a])))
-//console.log('let r3 = ', to_regex(3))
-console.log('let r5 = ', to_regex(5))
+console.log('let r3 = ', to_regex(3))
+//console.log('let r5 = ', to_regex(5))
 //console.log('let r7 = ', to_regex(7))
 //console.log('let r11 = ', to_regex(11))
 //console.log('let r13 = ', to_regex(13))
