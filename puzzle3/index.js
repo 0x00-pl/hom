@@ -39,9 +39,7 @@ function get_lr(arr){
 }
 
 let permute_dict = new Array(8).fill(0).map(i=>new Array(8).fill(0).map(j=>new Set()))
-
 let usedChars = [];
-
 function permute(input) {
     let i, ch;
     for (i = 0; i < input.length; i++) {
@@ -59,8 +57,35 @@ function permute(input) {
         usedChars.pop();
     }
     return permArr
-};
+}
+permute([0,1,2,3,4,5,6])
 
-function views_to_builds(n){
-    return 
+
+function views_to_builds(l, r){
+    return permute_dict[l][r]
+}
+
+function match(base, p){
+    for(let i=0; i<7; i++){
+        if(base[i] != -1){
+            if(base[i] != p[i]){
+                return false
+            }
+        }
+    }
+    return true
+}
+
+function prob(idx, pool){
+    let sumr = new Array(7).fill(0).map(x=>new Array(7).fill(0))
+    pool.forEach(l=>{
+        l.forEach((n,i)=>{
+            sumr[i][n]++
+        })
+    })
+    return sumr.map(n=>n/pool.length)
+}
+
+function prob_m(l){
+    let 
 }
