@@ -126,5 +126,26 @@ define(['document'], (document)=>{
         dom_bind_to_obj(dom, new_obj)
     }
 
-    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions, dom_bind_to_obj, bind_all }
+    function traced_object(hset){
+        let handler = {
+            set(o, prop, value){
+                o[prop] = value
+                hset(`${o.__name__}.${prop}`, value)
+                return true
+            },
+            get(o, prop){
+                let op = o[prop]
+                op.__name__ = `${o.__name__}.${prop}`
+                if(op instanceof Object){
+                    return new Proxy(op, handler)
+                } else {
+                    return op
+                }
+            }
+        }
+        return new Proxy({__name__: ''}, handler)
+    }
+
+
+    return { hook_obj, hook_obj_rec, notify_handlers, obj_pipe_dom, obj_bind_to_dom, dom_bind_to_functions, dom_bind_to_obj, bind_all, traced_object }
 })

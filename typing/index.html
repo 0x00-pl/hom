@@ -49,6 +49,13 @@
              dom_bind.bind_all(pl_dom_bind_dom, {
                  keypress(ev){console.log('kpress ev: ', ev)},
              })
+
+             let traced = dom_bind.traced_object((k,v)=>console.log(`${k} = ${v}:${typeof v}`))
+             traced.a = 1
+             traced.l = []
+             traced.l[0] = 2
+             traced.l[1] = '3'
+             console.log('get', traced.l.length)
          })
         </script>
     </body>
