@@ -28,10 +28,24 @@
                 undefined
             </div>
             <input id="entry" pl_events='["keypress"]' type="text" value=""/>
+            <div id="fw_root">
+                <h1>counter example</h1>
+                <button plb:text_content=".sum" plb:onClick=".click"></button>
+            </div>
         </main>
         <script module-name="index">
          define.cache['document'] = document
-         define(['dom-bind'], (dom_bind)=>{
+         define(['framework'], (fw)=>{
+             let root = document.getElementById('fw_root')
+             let model = fw.bind_model(root, {
+                 sum: 0,
+                 click(){ model.sum = model.sum + 1 }
+             })
+         })
+
+
+
+         if(false)define(['dom-bind'], (dom_bind)=>{
              let root = { value: '123' }
              root = dom_bind.hook_obj_rec(root, dom_bind.notify_handlers)
              let words = document.getElementById('words')
