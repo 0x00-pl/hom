@@ -31,6 +31,9 @@
             <div id="fw_root">
                 <h1>counter example</h1>
                 <button plb:text_content=".sum" plb:onClick=".click"></button>
+                <h1>reverse string</h1>
+                <input plb:oninput=".input">
+                <div plb:text_content=".str_rev"></div>
             </div>
         </main>
         <script module-name="index">
@@ -39,7 +42,9 @@
              let root = document.getElementById('fw_root')
              let model = fw.bind_model(root, {
                  sum: 0,
-                 click(){ model.sum = model.sum + 1 }
+                 click(){ model.sum = model.sum + 1 },
+                 str_rev: '',
+                 input(ev){ model.str_rev = ev.target.value.split('').reverse().join('') }
              })
          })
 
