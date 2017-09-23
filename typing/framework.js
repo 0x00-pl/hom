@@ -27,12 +27,18 @@ define(['document'], (document)=>{
             .replace(/_y/g, "Y")
             .replace(/_z/g, "Z")
     }
+    function deep_get(root, path){
+        let toks = path.split('.').filter(a=>a.length!=0)
+        return toks.reduce((acc,v)=>{
+            return acc[v]
+        }, root)
+    }
     // model to events
     function create_model(base_obj, setter){
         let handler = {
             set(o, prop, value){
                 o[prop] = value
-                setter(`${o.__name__}.${prop}`, value)
+                setter(`${o.__name__}.${prop}`, value, base_obj)
                 return true
             },
             get(o, prop){
@@ -49,33 +55,62 @@ define(['document'], (document)=>{
     }
     // from dom build events applyer
     function collect_relations(node, ret){
-        if(node.nodeType == Node.TEXT_NODE){
-            // TODO
-            return
+        if(node.nodeType == Node.ELEMENT_NODE && node.tagName.startsWith('PLB:')){
+            let binds = {}
+            Array.forEach(node.attributes, (attr)=>binds[attr.name]=attr.value)
+            console.log(binds)
+        }else if(node.nodeType == Node.TEXT_NODE){
+            let text = node.nodeValue
+            let binds = text.match(/\$\{.+?\}/g) || []
+            function update(value, source, root){
+                let r = text
+                binds.forEach(v=>{
+                    let path = v.substring(2, v.length-1)
+                    r = r.replace(v, deep_get(root, source))
+                    node.nodeValue = r
+                })
+            }
+            binds.forEach(v=>{
+                let path = v.substring(2, v.length-1)
+                ret[path] = ret[path] || []
+                ret[path].push(update)
+            })
+        } else {
+            let binds = Array.filter(node.attributes, attr=>attr.name.startsWith('plb:'))
+                .map(attr=>[caml_case(attr.name.substr(4)), attr.value])
+            binds.forEach(([prop, path])=>{
+                ret[path] = ret[path] || []
+                ret[path].push((value, path, root)=>node[prop]=value)
+            })
+            node.childNodes.forEach(child_node=>collect_relations(child_node, ret))
         }
-        let binds = Array.filter(node.attributes, attr=>attr.name.startsWith('plb:')).map(attr=>[caml_case(attr.name.substr(4)), attr.value])
-        binds.forEach(([prop, source])=>{
-            ret[source] = ret[source] || []
-            ret[source].push([node, prop])
-        })
-        node.childNodes.forEach(child_node=>collect_relations(child_node, ret))
     }
 
     function build_setter(dom){
         let targets = {}
         collect_relations(dom, targets)
 
-        return function(path, value){
-            if(targets[path]) targets[path].forEach(([node, prop])=>{
-                node[prop] = value
+        return function(path, value, root){
+            console.log('set: ', path, value)
+            if(targets[path]) targets[path].forEach(cb=>{
+                cb(value, path, root)
             })
         }
     }
 
+    function refreash(model){
+        Object.entries(model).forEach(([k,v])=>{
+            model[k] = v
+            if(v instanceof Object){
+                refreash(v)
+            }
+        })
+    }
     function bind_model(dom, base_obj){
         let setter = build_setter(dom)
         let ret = create_model(base_obj, setter)
-        Object.entries(ret).forEach(([k,v])=>{ret[k]=v})
+        // Object.entries(ret).forEach(([k,v])=>{ret[k]=v})
+        refreash(ret)
         return ret
     }
 

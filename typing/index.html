@@ -28,25 +28,59 @@
                 undefined
             </div>
             <input id="entry" pl_events='["keypress"]' type="text" value=""/>
+
+
+
+
+
+
+
+
+
             <div id="fw_root">
-                <h1>counter example</h1>
-                <button plb:text_content=".sum" plb:onClick=".click"></button>
-                <h1>reverse string</h1>
-                <input plb:oninput=".input">
-                <div plb:text_content=".str_rev"></div>
+                <div id="fw_root_sum">
+                    <h1>counter example ${.sum}</h1>
+                    <button plb:text_content=".sum" plb:onClick=".click"></button>
+                </div>
+                <div id="fw_root_rev">
+                    <h1>reverse string</h1>
+                    <input plb:oninput=".input">
+                    <div>${.str.str_rev}</div>
+                </div>
+                <div id="fw_root_component">
+                    <plb:counter default="0" default="9"></plb:counter>
+                </div>
             </div>
         </main>
+
         <script module-name="index">
          define.cache['document'] = document
          define(['framework'], (fw)=>{
              let root = document.getElementById('fw_root')
-             let model = fw.bind_model(root, {
+             let root_sum = document.getElementById('fw_root_sum')
+             let root_rev = document.getElementById('fw_root_rev')
+             let model_sum = fw.bind_model(root_sum, {
                  sum: 0,
-                 click(){ model.sum = model.sum + 1 },
-                 str_rev: '',
-                 input(ev){ model.str_rev = ev.target.value.split('').reverse().join('') }
+                 click(){ model_sum.sum = model_sum.sum + 1 }
+             })
+             let model_rev = fw.bind_model(root_rev, {
+                 str: {str_rev: ''},
+                 input(ev){ model_rev.str.str_rev = ev.target.value.split('').reverse().join('') }
+             })
+
+             let root_c = document.getElementById('fw_root_component')
+             let model_c = fw.bind_model(root_c, {
+                 d: 0
              })
          })
+
+
+
+
+
+
+
+
 
 
 
