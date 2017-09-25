@@ -57,6 +57,20 @@ define(['document'], (document)=>{
             ret[path] = ret[path] || []
             ret[path].push((value, path, root)=>node[prop]=value)
         })
-        // node.childNodes.forEach(child_node=>collect_relations(child_node, ret))
+        node.childNodes.forEach(child_node=>collect_node(child_node, ret))
+    }
+    function component_node(node, ret){
+        let binds = Array.forEach(node.attributes, attr=>{
+            let path = attr.value
+            let prop = attr.name
+            ret[prop] = ret[prop] || []
+            ret[prop].push((value, path, root)=>node[prop]=value)
+        })
+    }
+    function collect_node(node, ret){
+
+    }
+    function make_component(dom, model, props, component_dom_maker){
+        let setters = 
     }
 })
