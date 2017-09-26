@@ -68,8 +68,20 @@ define(['document'], (document)=>{
         })
     }
     function collect_node(node, ret){
-
+        ret = ret || {}
+        if(node.nodeType == Node.TEXT_NODE){
+            text_node(node, ret)
+        } else if(node.nodeType == Node.ELEMENT_NODE){
+            let tagName = node.tagName.startsWith
+            if(tagName.startsWith('PLB:')){
+                tagName = tagName.substr(4)
+                component_node(node, ret)
+            } else {
+                normal_node(node, ret)
+            }
+        }
     }
+
     function make_component(dom, model, props, component_dom_maker){
         let setters = 
     }
