@@ -47,15 +47,39 @@
                     <input plb:oninput=".input">
                     <div>${.str.str_rev}</div>
                 </div>
-                <div id="fw_root_component">
-                    <plb:counter default="0" default="9"></plb:counter>
+                <div id="cp_root">
+                    <plb:counter base="0"></plb:counter>
                 </div>
             </div>
         </main>
 
         <script module-name="index">
          define.cache['document'] = document
-         define(['framework'], (fw)=>{
+         define(['component'], (comp)=>{
+             function comp_counter(props){
+                 let { base } = props
+                 let new_node = document.getElementById('fw_root_sum').cloneNode(true)
+                 new_node.removeAttribute('id')
+                 console.log('[debug]:', 'make_component ', new_node.tagName, props)
+                 let model = comp.make_component(new_node, {
+                     sum: base,
+                     click(){
+                         console.log((model.sum|0), (model.sum|0)+1)
+                         model.sum = (model.sum|0) + 1
+                     }
+                 }, {})
+                 return [model, new_node]
+             }
+
+             let root = document.getElementById('cp_root')
+             comp.make_component(root, {}, { COUNTER: comp_counter })
+         })
+
+
+
+
+
+         if(false) define(['framework'], (fw)=>{
              let root = document.getElementById('fw_root')
              let root_sum = document.getElementById('fw_root_sum')
              let root_rev = document.getElementById('fw_root_rev')
@@ -67,22 +91,7 @@
                  str: {str_rev: ''},
                  input(ev){ model_rev.str.str_rev = ev.target.value.split('').reverse().join('') }
              })
-
-             let root_c = document.getElementById('fw_root_component')
-             let model_c = fw.bind_model(root_c, {
-                 d: 0
-             })
          })
-
-
-
-
-
-
-
-
-
-
 
          if(false)define(['dom-bind'], (dom_bind)=>{
              let root = { value: '123' }

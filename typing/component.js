@@ -36,6 +36,17 @@ define(['document'], (document)=>{
     function replace_node(anchor, node){
         anchor.parentNode.replaceChild(node, anchor)
     }
+    function refreash(model){
+        Object.keys(model).forEach((k)=>{
+            if(k.startsWith('__')){ return }
+
+            let v = model[k]
+            model[k] = v
+            if(v instanceof Object){
+                refreash(v)
+            }
+        })
+    }
     function text_node(node, ret){
         let text = node.nodeValue
         let binds = text.match(/\$\{.+?\}/g) || []
@@ -60,18 +71,19 @@ define(['document'], (document)=>{
             ret[path] = ret[path] || []
             ret[path].push((value, path, root)=>node[prop]=value)
         })
-        node.childNodes.forEach(child_node=>collect_node(child_node, ret))
+        node.childNodes.forEach(child_node=>collect_node(child_node, ret, component_dom_maker))
     }
     function component_node(node, ret, component_dom_maker){
         let tagName = node.tagName.substr(4)
-        let component_dom_maker = component_dom_maker[tagName] || function(){ throw `NotImplmentError: component ${tagName}` }
-        let props = Array.map(attr=>[caml_case(attr.name), attr.value])
-        let [component, new_node] = component_dom_maker(props)
+        let cur_component_dom_maker = component_dom_maker[tagName] || function(){ throw `NotImplmentError: component ${tagName}` }
+        let props = {}
+        Array.forEach(node.attributes, attr=>props[caml_case(attr.name)]=attr.value)
+        let [model, new_node] = cur_component_dom_maker(props)
         replace_node(node, new_node)
-        props.forEach(([prop, value])=>{
+        Object.entries(props).forEach(([prop, value])=>{
             let path = `${node.__name__}.${prop}`
             ret[path] = ret[path] || []
-            ret[path].push((value, path, root)=>component[prop]=value)
+            ret[path].push((value, path, root)=>model[prop]=value)
         })
     }
     function collect_node(node, ret, component_dom_maker){
@@ -79,7 +91,7 @@ define(['document'], (document)=>{
         if(node.nodeType == Node.TEXT_NODE){
             text_node(node, ret)
         } else if(node.nodeType == Node.ELEMENT_NODE){
-            let tagName = node.tagName.startsWith
+            let tagName = node.tagName
             if(tagName.startsWith('PLB:')){
                 component_node(node, ret, component_dom_maker)
             } else {
@@ -87,24 +99,34 @@ define(['document'], (document)=>{
             }
         }
     }
+    function make_setter(collection){
+        return function(path, value, root){
+            if(collection[path]) collection[path].forEach(cb=>{
+                cb(value, path, root)
+            })
+        }
+    }
 
     function build_proxy(obj, setter){
         let handler = {
             set(o, prop, value){
                 o[prop] = value
+                console.log('[debug]: setting: ', `${o.__name__}.${prop}`, value, o[prop], setter)
                 if(!prop.startsWith('__')){
                     setter(`${o.__name__}.${prop}`, value, obj)
                 }
                 return true
             },
-            get(o, prop){
-                let op = (o.__unproxy__)[prop]
-                op.__name__ = `${o.__name__}.${prop}`
-                op.__unproxy__ = o[prop]
-
+            get(o, prop){ //TODO debug
+                console.log('[debug]: getting: ', `${o.__name__}.${prop}`, o[prop])
                 if(prop.startsWith('__')){
-                    return op
+                    return o[prop]
                 }
+                let op = (o.__unproxy__)[prop]
+                console.log('[debug]: op: ', op)
+
+                op.__name__ = op.__name__ || `${o.__name__}.${prop}`
+                op.__unproxy__ = op.__unproxy__ || o[prop]
 
                 if(op instanceof Object){
                     return new Proxy(op, handler)
@@ -116,10 +138,15 @@ define(['document'], (document)=>{
         return new Proxy(Object.assign({__name__: '', __unproxy__: obj}, obj), handler)
     }
 
-    function make_component(dom, model, props, component_dom_maker){
-        let setters = collect_node(dom, {}, component_dom_maker)
-        let obj_proxy = build_proxy(Object.assign({}, props, model), setters)
-        return obj_proxy
+    function make_component(dom, model, component_dom_maker){
+        let collection = {}
+        collect_node(dom, collection, component_dom_maker)
+        let setter = make_setter(collection)
+        console.log('[debug]: setters ', setter)
+        let new_model = build_proxy(model, setter)
+        console.log('[debug]: model ', model)
+        refreash(new_model)
+        return new_model
     }
     return { make_component }
 })
