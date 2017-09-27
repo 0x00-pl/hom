@@ -33,6 +33,9 @@ define(['document'], (document)=>{
             return acc[v]
         }, root)
     }
+    function replace_node(anchor, node){
+        anchor.parentNode.replaceChild(node, anchor)
+    }
     function text_node(node, ret){
         let text = node.nodeValue
         let binds = text.match(/\$\{.+?\}/g) || []
@@ -50,7 +53,7 @@ define(['document'], (document)=>{
             ret[path].push(update)
         })
     }
-    function normal_node(node, ret){
+    function normal_node(node, ret, component_dom_maker){
         let binds = Array.filter(node.attributes, attr=>attr.name.startsWith('plb:'))
             .map(attr=>[caml_case(attr.name.substr(4)), attr.value])
         binds.forEach(([prop, path])=>{
@@ -59,30 +62,64 @@ define(['document'], (document)=>{
         })
         node.childNodes.forEach(child_node=>collect_node(child_node, ret))
     }
-    function component_node(node, ret){
-        let binds = Array.forEach(node.attributes, attr=>{
-            let path = attr.value
-            let prop = attr.name
-            ret[prop] = ret[prop] || []
-            ret[prop].push((value, path, root)=>node[prop]=value)
+    function component_node(node, ret, component_dom_maker){
+        let tagName = node.tagName.substr(4)
+        let component_dom_maker = component_dom_maker[tagName] || function(){ throw `NotImplmentError: component ${tagName}` }
+        let props = Array.map(attr=>[caml_case(attr.name), attr.value])
+        let [component, new_node] = component_dom_maker(props)
+        replace_node(node, new_node)
+        props.forEach(([prop, value])=>{
+            let path = `${node.__name__}.${prop}`
+            ret[path] = ret[path] || []
+            ret[path].push((value, path, root)=>component[prop]=value)
         })
     }
-    function collect_node(node, ret){
+    function collect_node(node, ret, component_dom_maker){
         ret = ret || {}
         if(node.nodeType == Node.TEXT_NODE){
             text_node(node, ret)
         } else if(node.nodeType == Node.ELEMENT_NODE){
             let tagName = node.tagName.startsWith
             if(tagName.startsWith('PLB:')){
-                tagName = tagName.substr(4)
-                component_node(node, ret)
+                component_node(node, ret, component_dom_maker)
             } else {
-                normal_node(node, ret)
+                normal_node(node, ret, component_dom_maker)
             }
         }
     }
 
-    function make_component(dom, model, props, component_dom_maker){
-        let setters = 
+    function build_proxy(obj, setter){
+        let handler = {
+            set(o, prop, value){
+                o[prop] = value
+                if(!prop.startsWith('__')){
+                    setter(`${o.__name__}.${prop}`, value, obj)
+                }
+                return true
+            },
+            get(o, prop){
+                let op = (o.__unproxy__)[prop]
+                op.__name__ = `${o.__name__}.${prop}`
+                op.__unproxy__ = o[prop]
+
+                if(prop.startsWith('__')){
+                    return op
+                }
+
+                if(op instanceof Object){
+                    return new Proxy(op, handler)
+                } else {
+                    return op
+                }
+            }
+        }
+        return new Proxy(Object.assign({__name__: '', __unproxy__: obj}, obj), handler)
     }
+
+    function make_component(dom, model, props, component_dom_maker){
+        let setters = collect_node(dom, {}, component_dom_maker)
+        let obj_proxy = build_proxy(Object.assign({}, props, model), setters)
+        return obj_proxy
+    }
+    return { make_component }
 })
