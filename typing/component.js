@@ -51,6 +51,7 @@ define(['document'], (document)=>{
         let text = node.nodeValue
         let binds = text.match(/\$\{.+?\}/g) || []
         function update(value, source, root){
+            // console.log('[debug]: update text', value, source, root)
             let r = text
             binds.forEach(v=>{
                 let path = v.substring(2, v.length-1)
@@ -108,25 +109,29 @@ define(['document'], (document)=>{
     }
 
     function build_proxy(obj, setter){
+        let new_obj = Object.assign({__name__: ''}, obj)
         let handler = {
             set(o, prop, value){
-                o[prop] = value
-                console.log('[debug]: setting: ', `${o.__name__}.${prop}`, value, o[prop], setter)
+                let vup = value.__unproxy__ || value
+                o[prop] = vup
+                // console.log('[debug]: setting: ', `${o.__name__}.${prop}`, vup, o, new_obj, o==new_obj)
                 if(!prop.startsWith('__')){
-                    setter(`${o.__name__}.${prop}`, value, obj)
+                    setter(`${o.__name__}.${prop}`, value, new_obj)
                 }
                 return true
             },
-            get(o, prop){ //TODO debug
-                console.log('[debug]: getting: ', `${o.__name__}.${prop}`, o[prop])
+            get(o, prop){
+                // console.log('[debug]: getting: ', `${o.__name__}.${prop}`, o[prop])
+                if(prop == '__unproxy__'){
+                    return o
+                }
                 if(prop.startsWith('__')){
                     return o[prop]
                 }
-                let op = (o.__unproxy__)[prop]
-                console.log('[debug]: op: ', op)
+                let op = o[prop]
+                // console.log('[debug]: op: ', op)
 
                 op.__name__ = op.__name__ || `${o.__name__}.${prop}`
-                op.__unproxy__ = op.__unproxy__ || o[prop]
 
                 if(op instanceof Object){
                     return new Proxy(op, handler)
@@ -135,16 +140,16 @@ define(['document'], (document)=>{
                 }
             }
         }
-        return new Proxy(Object.assign({__name__: '', __unproxy__: obj}, obj), handler)
+        return new Proxy(new_obj, handler)
     }
 
     function make_component(dom, model, component_dom_maker){
         let collection = {}
         collect_node(dom, collection, component_dom_maker)
         let setter = make_setter(collection)
-        console.log('[debug]: setters ', setter)
+        // console.log('[debug]: setters ', setter)
         let new_model = build_proxy(model, setter)
-        console.log('[debug]: model ', model)
+        // console.log('[debug]: model ', model)
         refreash(new_model)
         return new_model
     }

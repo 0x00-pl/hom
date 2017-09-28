@@ -60,11 +60,11 @@
                  let { base } = props
                  let new_node = document.getElementById('fw_root_sum').cloneNode(true)
                  new_node.removeAttribute('id')
-                 console.log('[debug]:', 'make_component ', new_node.tagName, props)
+                 /* console.log('[debug]:', 'make_component ', new_node.tagName, props)*/
                  let model = comp.make_component(new_node, {
                      sum: base,
                      click(){
-                         console.log((model.sum|0), (model.sum|0)+1)
+                         /* console.log((model.sum|0), (model.sum|0)+1)*/
                          model.sum = (model.sum|0) + 1
                      }
                  }, {})
