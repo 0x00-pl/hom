@@ -49,20 +49,22 @@ define(['document'], (document)=>{
     }
     function text_node(node, ret){
         let text = node.nodeValue
-        let binds = text.match(/\$\{.+?\}/g) || []
+        let binds = text.match(/\{\{.+?\}\}/g) || []
+        // console.log('[debug]: text_node: <<<', node.nodeValue, '>>>', binds)
         function update(value, source, root){
             // console.log('[debug]: update text', value, source, root)
             let r = text
             binds.forEach(v=>{
-                let path = v.substring(2, v.length-1)
+                let path = v.substring(2, v.length-2)
                 r = r.replace(v, deep_get(root, source))
                 node.nodeValue = r
             })
         }
         binds.forEach(v=>{
-            let path = v.substring(2, v.length-1)
+            let path = v.substring(2, v.length-2)
             ret[path] = ret[path] || []
             ret[path].push(update)
+            // console.log('[debug]: binds push: ', path)
         })
     }
     function normal_node(node, ret, component_dom_maker){

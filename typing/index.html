@@ -28,15 +28,6 @@
                 undefined
             </div>
             <input id="entry" pl_events='["keypress"]' type="text" value=""/>
-
-
-
-
-
-
-
-
-
             <div id="fw_root">
                 <div id="fw_root_sum">
                     <h1>counter example ${.sum}</h1>
@@ -47,33 +38,40 @@
                     <input plb:oninput=".input">
                     <div>${.str.str_rev}</div>
                 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 <div id="cp_root">
-                    <plb:counter base="0"></plb:counter>
+                    <PLB:COUNTER base="0"></PLB:COUNTER>
                 </div>
             </div>
         </main>
 
         <script module-name="index">
          define.cache['document'] = document
-         define(['component'], (comp)=>{
-             function comp_counter(props){
-                 let { base } = props
-                 let new_node = document.getElementById('fw_root_sum').cloneNode(true)
-                 new_node.removeAttribute('id')
-                 /* console.log('[debug]:', 'make_component ', new_node.tagName, props)*/
-                 let model = comp.make_component(new_node, {
-                     sum: base,
-                     click(){
-                         /* console.log((model.sum|0), (model.sum|0)+1)*/
-                         model.sum = (model.sum|0) + 1
-                     }
-                 }, {})
-                 return [model, new_node]
-             }
-
+         define(['component', 'counter'], (comp, counter)=>{
              let root = document.getElementById('cp_root')
-             comp.make_component(root, {}, { COUNTER: comp_counter })
+             comp.make_component(root, {}, { COUNTER: counter })
          })
+
+
+
+
 
 
 
