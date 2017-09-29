@@ -81,7 +81,7 @@ define(['document'], (document)=>{
         let cur_component_dom_maker = component_dom_maker[tagName] || function(){ throw `NotImplmentError: component ${tagName}` }
         let props = {}
         Array.forEach(node.attributes, attr=>props[caml_case(attr.name)]=attr.value)
-        let [model, new_node] = cur_component_dom_maker(props)
+        let [model, new_node] = cur_component_dom_maker(props, node)
         replace_node(node, new_node)
         Object.entries(props).forEach(([prop, value])=>{
             let path = `${node.__name__}.${prop}`

@@ -4,8 +4,8 @@ define(['component', 'document'], (comp, document)=>{
         let base = props.base || 0
         let node = document.createElement('div')
         node.innerHTML = `
-                    <h1>counter example {{.sum}}</h1>
-                    <button plb:text_content=".sum" plb:onClick=".click"></button>
+<h1>counter example {{.sum}}</h1>
+<button plb:text_content=".sum" plb:onClick=".click"></button>
 `
         let model = comp.make_component(node, {
             sum: Number(base),
