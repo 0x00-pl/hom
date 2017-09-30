@@ -18,45 +18,7 @@
     </head>
     <body>
         <main>
-            <h1>
-                typing test
-            </h1>
-            <div id="words">
-                test words 123
-            </div>
-            <div id="pl_bind_test" pl_binds='{"textContent": "tc" , "value":"value"}'>
-                undefined
-            </div>
-            <input id="entry" pl_events='["keypress"]' type="text" value=""/>
-            <div id="fw_root">
-                <div id="fw_root_sum">
-                    <h1>counter example ${.sum}</h1>
-                    <button plb:text_content=".sum" plb:onClick=".click"></button>
-                </div>
-                <div id="fw_root_rev">
-                    <h1>reverse string</h1>
-                    <input plb:oninput=".input">
-                    <div>${.str.str_rev}</div>
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                <div id="cp_root">
+            <div id="cp_root">
                     <PLB:COUNTER base="0"></PLB:COUNTER>
                 </div>
             </div>
@@ -67,55 +29,6 @@
          define(['component', 'counter'], (comp, counter)=>{
              let root = document.getElementById('cp_root')
              comp.make_component(root, {}, { COUNTER: counter })
-         })
-
-
-
-
-
-
-
-
-
-         if(false) define(['framework'], (fw)=>{
-             let root = document.getElementById('fw_root')
-             let root_sum = document.getElementById('fw_root_sum')
-             let root_rev = document.getElementById('fw_root_rev')
-             let model_sum = fw.bind_model(root_sum, {
-                 sum: 0,
-                 click(){ model_sum.sum = model_sum.sum + 1 }
-             })
-             let model_rev = fw.bind_model(root_rev, {
-                 str: {str_rev: ''},
-                 input(ev){ model_rev.str.str_rev = ev.target.value.split('').reverse().join('') }
-             })
-         })
-
-         if(false)define(['dom-bind'], (dom_bind)=>{
-             let root = { value: '123' }
-             root = dom_bind.hook_obj_rec(root, dom_bind.notify_handlers)
-             let words = document.getElementById('words')
-             dom_bind.obj_pipe_dom(root, 'value', words, 'textContent')
-             root.value = '456'
-             console.log(root)
-
-
-             let pl_bind_test_obj = {tc:1}
-             let pl_bind_test_dom = document.getElementById('pl_bind_test')
-             let pl_binded_test_obj = dom_bind.obj_bind_to_dom(pl_bind_test_obj, pl_bind_test_dom)
-             pl_binded_test_obj.tc = 2
-
-             let pl_dom_bind_dom = document.getElementById('entry')
-             dom_bind.bind_all(pl_dom_bind_dom, {
-                 keypress(ev){console.log('kpress ev: ', ev)},
-             })
-
-             let traced = dom_bind.traced_object((k,v)=>console.log(`${k} = ${v}:${typeof v}`))
-             traced.a = 1
-             traced.l = []
-             traced.l[0] = 2
-             traced.l[1] = '3'
-             console.log('get', traced.l.length)
          })
         </script>
     </body>
