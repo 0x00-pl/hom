@@ -17,19 +17,33 @@
         </style>
     </head>
     <body>
-        <main>
-            <div id="cp_root">
-                    <PLB:COUNTER base="0"></PLB:COUNTER>
-                </div>
-            </div>
+        <main id="root">
+            <h1>typing</h1>
+            <PLB:TEXTA></PLB:TEXTA>
+            <PLB:TEXTB></PLB:TEXTB>
+            <button>restart</button>
         </main>
 
         <script module-name="index">
          define.cache['document'] = document
-         define(['component', 'counter'], (comp, counter)=>{
-             let root = document.getElementById('cp_root')
-             comp.make_component(root, {}, { COUNTER: counter })
+         define(['component', 'texta', 'textb'], (comp, texta, textb)=>{
+             let root = document.getElementById('root')
+             comp.make_component(root, {}, { TEXTA: texta, TEXTB: textb})
          })
         </script>
+
+        <example>
+            <div id="cp_root">
+                <PLB:COUNTER base="0"></PLB:COUNTER>
+            </div>
+
+            <script module-name="example">
+             define.cache['document'] = document
+             define(['component', 'counter'], (comp, counter)=>{
+                 let root = document.getElementById('cp_root')
+                 comp.make_component(root, {}, { COUNTER: counter })
+             })
+            </script>
+        </example>
     </body>
 </html>
