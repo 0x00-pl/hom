@@ -19,7 +19,7 @@
     <body>
         <main id="root">
             <h1>typing</h1>
-            <PLB:TEXTA></PLB:TEXTA>
+            <PLB:TEXTA plb:text_content=".text"></PLB:TEXTA>
             <PLB:TEXTB></PLB:TEXTB>
             <button>restart</button>
         </main>
@@ -28,7 +28,7 @@
          define.cache['document'] = document
          define(['component', 'texta', 'textb'], (comp, texta, textb)=>{
              let root = document.getElementById('root')
-             comp.make_component(root, {}, { TEXTA: texta, TEXTB: textb})
+             comp.make_component(root, { text: 'text' }, { TEXTA: texta, TEXTB: textb})
          })
         </script>
 
