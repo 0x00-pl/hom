@@ -5,7 +5,6 @@ const http         = require('http'),
       contentTypes = require('./utils/content-types'),
       sysInfo      = require('./utils/sys-info'),
       info         = require('./info'),
-      typing       = require('./typing'),
       doc          = require('./doc'),
       env          = process.env
 
@@ -19,7 +18,7 @@ app.get('/health', (req, res)=>{
 
 ;[
     ['/info', info],
-    ['/typing', typing],
+    ['/component', require('./component')],
     ['/doc', doc],
     ['/modules', express.static(path.join(__dirname, 'modules'))],
     ['/puzzle1', require('./puzzle1')],
